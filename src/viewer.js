@@ -34,6 +34,7 @@ export function createViewer(container) {
     color: 0x5b8ff0, metalness: 0.15, roughness: 0.55, flatShading: true,
   });
   let mesh = null;
+  let framed = false;
 
   function resize() {
     const w = container.clientWidth, h = container.clientHeight;
@@ -63,12 +64,17 @@ export function createViewer(container) {
     mesh = new THREE.Mesh(geo, material);
     scene.add(mesh);
 
-    controls.target.set(0, 0, 0);
-    const d = maxDim * 1.8;
-    camera.position.set(d * 0.8, d * 0.6, d);
+    // frame the model only once; on later rebuilds keep the user's orbit
+    // position so tweaking a parameter doesn't yank the view around
     camera.near = maxDim / 100; camera.far = maxDim * 20;
     camera.updateProjectionMatrix();
-    controls.update();
+    if (!framed) {
+      framed = true;
+      controls.target.set(0, 0, 0);
+      const d = maxDim * 1.8;
+      camera.position.set(d * 0.8, d * 0.6, d);
+      controls.update();
+    }
   }
 
   (function loop() {
