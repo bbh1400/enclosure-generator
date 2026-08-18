@@ -2,15 +2,21 @@ import Module from 'manifold-3d';
 import { makeBuilder } from './geometry.js';
 import { meshToBinarySTL } from './stl.js';
 import { createViewer } from './viewer.js';
+import { builtinSkull, traceImage } from './logo.js';
 import { DRIVE_PRESETS, DEFAULTS, DEVICE_FIELDS } from './presets.js';
 
 const $ = (id) => document.getElementById(id);
 const CONTROLS = ['preset', 'driveW', 'driveL', 'driveH', 'nDrives', 'gap',
   'slotClr', 'sideClr', 'wallT', 'railDepth', 'railT', 'baseT', 'backT', 'topCap',
-  'bumps', 'bumpH', 'bumpHalf', 'bumpYc', 'baseVent', 'backWindow'];
-const RANGE_OUT = { nDrives: '', gap: ' mm', slotClr: ' mm', sideClr: ' mm', bumpH: ' mm' };
+  'bumps', 'bumpH', 'bumpHalf', 'bumpYc',
+  'logoMode', 'logoThreshold', 'logoScale', 'logoDepth', 'logoWalls',
+  'baseVent', 'backWindow'];
+const RANGE_OUT = {
+  nDrives: '', gap: ' mm', slotClr: ' mm', sideClr: ' mm', bumpH: ' mm',
+  logoScale: ' mm', logoDepth: ' mm', logoThreshold: '',
+};
 
-let build = null, viewer = null, currentMesh = null;
+let build = null, viewer = null, currentMesh = null, tracedLogo = null;
 const state = { ...DEFAULTS };
 
 for (const [k, v] of Object.entries(DRIVE_PRESETS)) {
@@ -38,6 +44,11 @@ function applyStateToInputs() {
     else el.value = state[k];
   }
   updateOutputs();
+  updateLogoVisibility();
+}
+function updateLogoVisibility() {
+  $('customLogo').hidden = state.logoMode !== 'custom';
+  $('logoOpts').hidden = state.logoMode === 'none';
 }
 function updateOutputs() {
   for (const [k, unit] of Object.entries(RANGE_OUT)) {
@@ -67,7 +78,14 @@ function applyPreset(key) {
   applyStateToInputs();
 }
 
+function currentLogo() {
+  if (state.logoMode === 'skull') return builtinSkull();
+  if (state.logoMode === 'custom' && tracedLogo) return tracedLogo;
+  return null;
+}
+
 function paramsFromState() {
+  const logo = currentLogo();
   return {
     driveW: +state.driveW, driveL: +state.driveL, driveH: +state.driveH,
     nDrives: Math.max(1, Math.round(state.nDrives)), gap: +state.gap,
@@ -75,6 +93,7 @@ function paramsFromState() {
     wallT: +state.wallT, railDepth: +state.railDepth, railT: +state.railT,
     baseT: +state.baseT, backT: +state.backT, topCap: +state.topCap,
     bumps: !!state.bumps, bumpH: +state.bumpH, bumpHalf: +state.bumpHalf, bumpYc: +state.bumpYc,
+    logo: logo ? { polygons: logo.polygons, depth: +state.logoDepth, targetH: +state.logoScale, walls: state.logoWalls } : null,
     baseVent: !!state.baseVent, backWindow: !!state.backWindow,
     orientation: 'print',   // always export print-ready (no supports)
   };
@@ -117,13 +136,30 @@ function renderStats(s, ms) {
     `<span>~<b>${s.grams.toFixed(0)}</b> g PLA</span>` +
     `<span>~<b>${s.filamentM.toFixed(1)}</b> m</span>` +
     `<span>slot <b>${s.slotH.toFixed(1)}</b> mm · edge grip <b>${s.engagement.toFixed(1)}</b> mm</span>` +
+    (s.logo ? `<span>logo <b>${s.logo.width.toFixed(0)}×${s.logo.height.toFixed(0)}</b> mm</span>` : '') +
     `<span style="margin-left:auto;opacity:.6">${ms.toFixed(0)} ms</span>`;
+}
+
+async function retrace() {
+  const f = $('logoFile').files[0];
+  if (!f) return;
+  status('Tracing image…');
+  try {
+    tracedLogo = await traceImage(f, +state.logoThreshold);
+    status('Traced ✓');
+    regenerate();
+  } catch (e) {
+    tracedLogo = null;
+    status(e.message, true);
+  }
 }
 
 // ---- events ----
 function onInput(e) {
   if (e.target.id === 'preset') { applyPreset(e.target.value); }
   else { readInputs(); updateOutputs(); }
+  if (e.target.id === 'logoMode') updateLogoVisibility();
+  if (e.target.id === 'logoThreshold' && state.logoMode === 'custom') { retrace(); return; }
   location.replace('#' + encodeState());
   scheduleRegen();
 }
@@ -140,6 +176,7 @@ async function boot() {
   status('');
 
   for (const k of CONTROLS) $(k)?.addEventListener('input', onInput);
+  $('logoFile').addEventListener('change', retrace);
   $('btnExport').addEventListener('click', exportSTL);
   $('btnShare').addEventListener('click', share);
   regenerate();

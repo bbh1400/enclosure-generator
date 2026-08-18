@@ -9,6 +9,7 @@ A parametric, screwless, 3D-printable drive-cage generator that runs **entirely 
 - **2.5" (7 / 9.5 / 15 mm) and 3.5"** drive presets (SFF maximum envelopes → guaranteed fit).
 - **1–16 bays**, adjustable air gap.
 - **Screwless friction retention** — C-channel rails capture each drive top & bottom, with ramped bumps near the mouth for grip.
+- **Logo engraving** on the side walls — a built-in Intel 730 skull, or upload any image (traced to line-art in the browser). Height, depth and which walls are adjustable.
 - **Everything is editable.** Selecting a drive type loads that device's defaults as a starting point; then every value stays adjustable — drive W/L/thickness, clearances, wall / rail / base / back / top thicknesses, retention bumps, vents.
 - **Live 3D preview** (three.js) + **binary STL export**, always in the no-support print orientation (stands on its back, slots print as vertical grooves).
 - Live **size / volume / filament** estimates.

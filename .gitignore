@@ -1,31 +1,6 @@
-# Dependencies
 node_modules/
-
-# Build output
 dist/
-
-# Vite
-.vite/
-*.local
-
-# Test artifacts
 test_out_*.stl
-test/app_screenshot.png
-test-results/
-playwright-report/
-coverage/
-
-# Logs
-*.log
-npm-debug.log*
-
-# Environment
-.env
-.env.*
-
-# Editor / OS
+*.local
 .DS_Store
-Thumbs.db
-.idea/
-.vscode/*
-!.vscode/extensions.json
+test/app_screenshot.png

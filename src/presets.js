@@ -20,6 +20,8 @@ export const DEFAULTS = {
   wallT: 3.0, railDepth: 5.0, railT: 2.0, baseT: 3.0, backT: 3.0, topCap: 3.0,
   // retention
   bumps: true, bumpH: 0.4, bumpHalf: 3.0, bumpYc: 11.0,
+  // logo engraving (not device-specific)
+  logoMode: 'none', logoDepth: 1.2, logoScale: 70, logoWalls: 'both', logoThreshold: 120,
   // options
   baseVent: true, backWindow: true,
 };

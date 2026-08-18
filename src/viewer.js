@@ -27,8 +27,11 @@ export function createViewer(container) {
   grid.position.y = -0.01;
   scene.add(grid);
 
+  // flat shading: hard-surface CAD model, so shade each triangle by its true
+  // geometric normal. Smooth (averaged) normals make the box triangulation
+  // show through as diagonal streaks fanning across the flat faces.
   const material = new THREE.MeshStandardMaterial({
-    color: 0x5b8ff0, metalness: 0.15, roughness: 0.55, flatShading: false,
+    color: 0x5b8ff0, metalness: 0.15, roughness: 0.55, flatShading: true,
   });
   let mesh = null;
 

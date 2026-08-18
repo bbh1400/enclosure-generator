@@ -45,6 +45,40 @@
         <p class="note" id="slotNote"></p>
       </section>
 
+      <section>
+        <h2>Logo</h2>
+        <label>Engraving
+          <select id="logoMode">
+            <option value="none">None</option>
+            <option value="skull">Intel 730 skull (built-in)</option>
+            <option value="custom">Upload image…</option>
+          </select>
+        </label>
+        <div id="customLogo" hidden>
+          <label>Image file
+            <input type="file" id="logoFile" accept="image/*" />
+          </label>
+          <label>Trace threshold <output id="logoThresholdOut"></output>
+            <input type="range" id="logoThreshold" min="20" max="240" step="5" value="120" />
+          </label>
+        </div>
+        <div id="logoOpts" hidden>
+          <label>Height (mm) <output id="logoScaleOut"></output>
+            <input type="range" id="logoScale" min="15" max="140" step="1" />
+          </label>
+          <label>Depth (mm) <output id="logoDepthOut"></output>
+            <input type="range" id="logoDepth" min="0.4" max="2.5" step="0.1" />
+          </label>
+          <label>Walls
+            <select id="logoWalls">
+              <option value="both">Both sides</option>
+              <option value="left">Left only</option>
+              <option value="right">Right only</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
       <details id="structure">
         <summary>Bay structure</summary>
         <div class="row">

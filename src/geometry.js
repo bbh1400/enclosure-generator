@@ -17,13 +17,31 @@ export function makeBuilder(wasm) {
     return Manifold.cube([sx, sy, sz], false).translate([x0, y0, z0]);
   };
 
-  // Extrude a (u,v) triangle by `depth`, orient so u->Y, v->Z, depth->X, shift X.
-  // Used for the ramped friction bumps.
+  // Extrude (u,v) contours by `depth`, orient so u->Y, v->Z, depth->X, shift X.
+  // Used for the ramped friction bumps and the engraved logo.
   const placeExtruded = (contours, depth, xStart) => {
     const cs = new CrossSection(contours, 'EvenOdd');
     const ex = cs.extrude(depth).rotate([90, 0, 90]).translate([xStart, 0, 0]);
     cs.delete();
     return ex;
+  };
+
+  // Scale + centre logo polygons to a target height; return contours in (u,v).
+  const prepLogo = (polygons, targetH, cx, cy) => {
+    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+    for (const rings of polygons)
+      for (const ring of rings)
+        for (const [x, y] of ring) {
+          if (x < minX) minX = x; if (x > maxX) maxX = x;
+          if (y < minY) minY = y; if (y > maxY) maxY = y;
+        }
+    const s = targetH / (maxY - minY);
+    const ox = (minX + maxX) / 2, oy = (minY + maxY) / 2;
+    const contours = [];
+    for (const rings of polygons)
+      for (const ring of rings)
+        contours.push(ring.map(([x, y]) => [(x - ox) * s + cx, (y - oy) * s + cy]));
+    return { contours, width: (maxX - minX) * s, height: (maxY - minY) * s };
   };
 
   return function build(p) {
@@ -95,6 +113,26 @@ export function makeBuilder(wasm) {
       add(box(Math.min(xa, xb), Math.max(xa, xb), Y_FRONT, Y_BACK1, TOP_STACK, TOTAL_H));
     }
 
+    // engraved line-art logo on the side walls
+    let logoInfo = null;
+    if (p.logo && p.logo.polygons && p.logo.polygons.length) {
+      const availH = TOTAL_H * 0.9, availW = Y_DRIVE_BK * 0.9;
+      let targetH = Math.min(p.logo.targetH, availH);
+      const cx = Y_DRIVE_BK / 2, cy = TOTAL_H / 2;
+      let prep = prepLogo(p.logo.polygons, targetH, cx, cy);
+      if (prep.width > availW) {                     // keep it inside the wall
+        targetH *= availW / prep.width;
+        prep = prepLogo(p.logo.polygons, targetH, cx, cy);
+      }
+      logoInfo = { width: prep.width, height: prep.height };
+      const walls = p.logo.walls || 'both';
+      const sides = walls === 'both' ? [1, -1] : walls === 'left' ? [-1] : [1];
+      for (const s of sides) {
+        const xStart = s > 0 ? OUTER_X - p.logo.depth : -OUTER_X - 0.1;
+        cut(placeExtruded(prep.contours, p.logo.depth + 0.1, xStart));
+      }
+    }
+
     // boolean assembly
     let solid = Manifold.union(pos);
     if (neg.length) {
@@ -126,6 +164,7 @@ export function makeBuilder(wasm) {
       stats: {
         size, volCm3, grams, filamentM, slotH: SLOT_H,
         engagement: p.driveW / 2 - (INNER_X - p.railDepth),
+        logo: logoInfo,
       },
     };
   };

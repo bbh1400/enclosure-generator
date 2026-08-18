@@ -3,10 +3,12 @@ import Module from 'manifold-3d';
 import { makeBuilder } from '../src/geometry.js';
 import { meshToBinarySTL } from '../src/stl.js';
 import { DRIVE_PRESETS, DEFAULTS } from '../src/presets.js';
+import { readFileSync } from 'fs';
 
 const wasm = await Module();
 wasm.setup();
 const build = makeBuilder(wasm);
+const skull = JSON.parse(readFileSync(new URL('../src/assets/intel_skull.json', import.meta.url)));
 
 // merge global defaults + a preset's device values, like the UI does
 const cfg = (presetKey, over = {}) => {
@@ -29,6 +31,10 @@ function run(name, presetKey, over) {
 
 const full = run('6x 2.5" (7mm)', '2.5-7', { nDrives: 6 });
 writeFileSync(new URL('../test_out_full.stl', import.meta.url), meshToBinarySTL(full.mesh));
+
+const logoed = run('6x 2.5" + skull logo', '2.5-7', { nDrives: 6,
+  logo: { polygons: skull.polygons, depth: 1.2, targetH: 70, walls: 'both' } });
+writeFileSync(new URL('../test_out_logo.stl', import.meta.url), meshToBinarySTL(logoed.mesh));
 
 run('1x 2.5" tester', '2.5-7', { nDrives: 1 });
 run('4x 2.5" custom slot', '2.5-7', { nDrives: 4, driveH: 9.0, gap: 8, slotClr: 0.7 });

@@ -10,6 +10,7 @@
     "test:geo": "node test/test_geometry.mjs"
   },
   "dependencies": {
+    "d3-contour": "^4.0.2",
     "manifold-3d": "^3.0.0",
     "three": "^0.169.0"
   },
