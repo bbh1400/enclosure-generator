@@ -1,6 +1,6 @@
 # SSD / HDD Cage Generator
 
-A parametric, screwless, 3D-printable drive-cage generator that runs **entirely in the browser** — no server. Pick a drive type and count, set the spacing, fine-tune any dimension you like, and download a print-ready STL.
+ A parametric, screwless, 3D-printable drive-cage generator that runs **entirely in the browser** — no server. Pick a drive type and count, set the spacing, fine-tune any dimension you like, and download a print-ready STL.
 
 ![preview](docs/preview.png)
 
