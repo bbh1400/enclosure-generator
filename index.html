@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SSD Cage Generator</title>
+  <link rel="stylesheet" href="./src/style.css" />
+</head>
+<body>
+  <header>
+    <h1>SSD / HDD Cage Generator</h1>
+    <p class="sub">Parametric, screwless 3D-printable drive cage &mdash; runs entirely in your browser.</p>
+  </header>
+
+  <main>
+    <aside id="panel">
+      <section>
+        <h2>Drive</h2>
+        <label>Drive type <span class="hint">(sets defaults)</span>
+          <select id="preset"></select>
+        </label>
+        <div class="row">
+          <label>Width (mm)<input type="number" id="driveW" min="30" max="150" step="0.05" /></label>
+          <label>Length (mm)<input type="number" id="driveL" min="40" max="220" step="0.05" /></label>
+        </div>
+        <label>Drive thickness (mm)
+          <input type="number" id="driveH" min="3" max="40" step="0.1" />
+        </label>
+        <label>Number of drives <output id="nDrivesOut"></output>
+          <input type="range" id="nDrives" min="1" max="16" step="1" />
+        </label>
+        <label>Gap between drives (mm) <output id="gapOut"></output>
+          <input type="range" id="gap" min="0" max="30" step="0.5" />
+        </label>
+      </section>
+
+      <section>
+        <h2>Fit &amp; clearance</h2>
+        <label>Slot clearance (mm) <output id="slotClrOut"></output>
+          <input type="range" id="slotClr" min="0.2" max="2" step="0.05" />
+        </label>
+        <label>Side clearance / side (mm) <output id="sideClrOut"></output>
+          <input type="range" id="sideClr" min="0.2" max="2" step="0.05" />
+        </label>
+        <p class="note" id="slotNote"></p>
+      </section>
+
+      <details id="structure">
+        <summary>Bay structure</summary>
+        <div class="row">
+          <label>Wall (mm)<input type="number" id="wallT" min="1.5" max="6" step="0.1" /></label>
+          <label>Rail depth (mm)<input type="number" id="railDepth" min="2" max="15" step="0.5" /></label>
+        </div>
+        <div class="row">
+          <label>Rail thick (mm)<input type="number" id="railT" min="1" max="5" step="0.1" /></label>
+          <label>Base (mm)<input type="number" id="baseT" min="0" max="6" step="0.5" /></label>
+        </div>
+        <div class="row">
+          <label>Back frame (mm)<input type="number" id="backT" min="0" max="6" step="0.5" /></label>
+          <label>Top cap (mm)<input type="number" id="topCap" min="0" max="6" step="0.5" /></label>
+        </div>
+        <label>Base vent <input type="checkbox" id="baseVent" /></label>
+        <label>Back window <input type="checkbox" id="backWindow" /></label>
+      </details>
+
+      <details id="retention">
+        <summary>Retention</summary>
+        <label>Friction bumps <input type="checkbox" id="bumps" /></label>
+        <label>Bump height (mm) <output id="bumpHOut"></output>
+          <input type="range" id="bumpH" min="0" max="1" step="0.05" />
+        </label>
+        <div class="row">
+          <label>Bump ½-length (mm)<input type="number" id="bumpHalf" min="1" max="8" step="0.5" /></label>
+          <label>Bump pos (mm)<input type="number" id="bumpYc" min="2" max="40" step="1" /></label>
+        </div>
+      </details>
+
+      <section>
+        <h2>Output</h2>
+        <p class="note">Exported standing on the mouth &mdash; prints with no supports.</p>
+        <button id="btnExport" class="primary">Download STL</button>
+        <button id="btnShare">Copy shareable link</button>
+      </section>
+    </aside>
+
+    <div id="stage">
+      <div id="view"></div>
+      <div id="stats" class="stats"></div>
+      <div id="status" class="status"></div>
+    </div>
+  </main>
+
+  <script type="module" src="./src/main.js"></script>
+</body>
+</html>

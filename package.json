@@ -1,0 +1,20 @@
+{
+  "name": "ssd-cage-generator",
+  "version": "1.0.0",
+  "description": "Parametric 3D-printable SSD/HDD cage generator (SPA)",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:geo": "node test/test_geometry.mjs"
+  },
+  "dependencies": {
+    "manifold-3d": "^3.0.0",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1",
+    "vite": "^5.4.0"
+  }
+}
